@@ -1,0 +1,7 @@
+/.vs
+/src/DotNetCore.CAP.DM/bin
+/src/DotNetCore.CAP.DM/obj
+/src/DotNetCore.CAP.DM/.vs
+/src/DotNetCore.CAP.DM/*.user
+/src/DotNetCore.CAP.DM/.vs/DotNetCore.CAP.DM/DesignTimeBuild/*.v2
+/src/DotNetCore.CAP.DM/Properties/PublishProfiles/*.user
