@@ -14,9 +14,9 @@ using Microsoft.Extensions.DependencyInjection;
 // ReSharper disable once CheckNamespace
 namespace DotNetCore.CAP
 {
-    public class MySqlCapTransaction : CapTransactionBase
+    public class DMCapTransaction : CapTransactionBase
     {
-        public MySqlCapTransaction(
+        public DMCapTransaction(
             IDispatcher dispatcher) : base(dispatcher)
         {
         }
@@ -121,7 +121,7 @@ namespace DotNetCore.CAP
             ICapPublisher publisher, bool autoCommit = false)
         {
             var trans = database.BeginTransaction();
-            publisher.Transaction.Value = ActivatorUtilities.CreateInstance<MySqlCapTransaction>(publisher.ServiceProvider);
+            publisher.Transaction.Value = ActivatorUtilities.CreateInstance<DMCapTransaction>(publisher.ServiceProvider);
             var capTrans = publisher.Transaction.Value.Begin(trans, autoCommit);
             return new CapEFDbTransaction(capTrans);
         }
@@ -142,7 +142,7 @@ namespace DotNetCore.CAP
             }
 
             var dbTransaction = dbConnection.BeginTransaction();
-            publisher.Transaction.Value = ActivatorUtilities.CreateInstance<MySqlCapTransaction>(publisher.ServiceProvider);
+            publisher.Transaction.Value = ActivatorUtilities.CreateInstance<DMCapTransaction>(publisher.ServiceProvider);
             return publisher.Transaction.Value.Begin(dbTransaction, autoCommit);
         }
     }
