@@ -48,7 +48,6 @@ SELECT
             var statistics = connection.ExecuteReader(sql, reader =>
             {
                 var statisticsDto = new StatisticsDto();
-
                 while (reader.Read())
                 {
                     statisticsDto.PublishedSucceeded = reader.GetInt32(0);
@@ -56,10 +55,8 @@ SELECT
                     statisticsDto.PublishedFailed = reader.GetInt32(2);
                     statisticsDto.ReceivedFailed = reader.GetInt32(3);
                 }
-
                 return statisticsDto;
             });
-
             return statistics;
         }
 
@@ -141,18 +138,16 @@ SELECT
                         StatusName = reader.GetString(index)
                     });
                 }
-
                 return messages;
             }, sqlParams);
-
             return new PagedQueryResult<MessageDto> { Items = items, PageIndex = queryDto.CurrentPage, PageSize = queryDto.PageSize, Totals = count };
         }
 
         public StatusName GetStatusName(string status)
         {
             StatusName? statusName = Enum.GetValues(typeof(StatusName))
-        .Cast<StatusName>()
-        .FirstOrDefault(c => c.ToString().Equals(status, StringComparison.OrdinalIgnoreCase));
+                .Cast<StatusName>()
+                .FirstOrDefault(c => c.ToString().Equals(status, StringComparison.OrdinalIgnoreCase));
             return statusName.Value;
         }
 
@@ -284,8 +279,9 @@ WHERE ""Key"" >= :minKey
 
                 return message;
             });
-
             return mediumMessage;
         }
+
+
     }
 }
