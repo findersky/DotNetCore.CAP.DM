@@ -40,84 +40,97 @@ namespace DotNetCore.CAP.DM
 
             var sql = CreateDbTablesScript();
             await using (var connection = new DmConnection(_options.Value.ConnectionString))
-                foreach (var item in sql)
-                {
-                    connection.ExecuteNonQuery(item);
-                }
+            connection.ExecuteNonQuery(sql);
             _logger.LogDebug("Ensuring all create database tables script are applied.");
         }
 
 
-        protected virtual List<string> CreateDbTablesScript()
+        private string GetOnlyTableNameString(string schemaTableName)
         {
-            List<string> result = new List<string>() {
-               $@"
-DECLARE
-    SCHEMA_EXIST INT;
-BEGIN
-    SELECT COUNT(*) INTO SCHEMA_EXIST FROM SYSOBJECTS WHERE TYPE$ = 'SCH' AND NAME = '{_options.Value.Schema}';
-    IF SCHEMA_EXIST = 0 THEN
-        EXECUTE IMMEDIATE 'CREATE SCHEMA ""{_options.Value.Schema}""';
-    END IF;
-END;
-",$@"
-CREATE TABLE IF NOT EXISTS {GetPublishedTableName()} (
-  ""Id"" BIGINT NOT NULL,
-  ""Version"" VARCHAR(20) DEFAULT NULL,
-  ""Name"" VARCHAR(400) NOT NULL,
-  ""Group"" VARCHAR(200) DEFAULT NULL,
-  ""Content"" CLOB,
-  ""Retries"" INT DEFAULT NULL,
-  ""Added"" DATETIME NOT NULL,
-  ""ExpiresAt"" DATETIME DEFAULT NULL,
-  ""StatusName"" VARCHAR(50) NOT NULL,
-  PRIMARY KEY (""Id"")
-);
-
-",$@"
-CREATE TABLE IF NOT EXISTS {GetReceivedTableName()} (
-  ""Id"" BIGINT NOT NULL,
-  ""Version"" VARCHAR(20) DEFAULT NULL,
-  ""Name"" VARCHAR(200) NOT NULL,
-  ""Content"" CLOB,
-  ""Retries"" INT DEFAULT NULL,
-  ""Added"" DATETIME NOT NULL,
-  ""ExpiresAt"" DATETIME DEFAULT NULL,
-  ""StatusName"" VARCHAR(40) NOT NULL,
-  PRIMARY KEY (""Id"")
-);
-"
-,$@"
-DECLARE
-  v_count INT;
-BEGIN
-  SELECT COUNT(*) INTO v_count 
-  FROM USER_INDEXES 
-  WHERE TABLE_NAME ='received' 
-    AND INDEX_NAME = 'index_received_expiresat';
-
-  IF v_count = 0 THEN
-    EXECUTE IMMEDIATE 'CREATE INDEX ""index_received_expiresat"" ON {GetReceivedTableName()}(""ExpiresAt"")';
-  END IF;
-END;
-",$@"
-DECLARE
-  v_count INT;
-BEGIN
-  SELECT COUNT(*) INTO v_count 
-  FROM USER_INDEXES 
-  WHERE TABLE_NAME = 'published' 
-    AND INDEX_NAME ='index_published_expiresat';
-
-  IF v_count = 0 THEN
-    EXECUTE IMMEDIATE 'CREATE INDEX ""index_published_expiresat"" ON {GetPublishedTableName()}(""ExpiresAt"")';
-  END IF;
-END;
-"
-
-            };
-           
-            return result;
+            if (string.IsNullOrWhiteSpace(schemaTableName))
+            {
+                return "";
+            }
+            return schemaTableName.Replace("\"", "").Replace($"{_options.Value.Schema}.", "");
         }
+        protected virtual string CreateDbTablesScript()
+        {
+            var batchSql =
+                $@"
+DECLARE
+    v_count INT;
+BEGIN
+    SELECT COUNT(*) INTO v_count FROM SYSOBJECTS WHERE TYPE$ = 'SCH' AND NAME = '{_options.Value.Schema}';
+    IF v_count = 0 THEN
+        EXECUTE IMMEDIATE 'CREATE SCHEMA ""{_options.Value.Schema}""';
+    END IF; 
+    SELECT COUNT(*)  
+    INTO v_count  
+    FROM USER_TABLES  
+    WHERE TABLE_NAME = '{GetOnlyTableNameString(GetReceivedTableName())}';  
+    IF v_count = 0 THEN  
+        EXECUTE IMMEDIATE 'CREATE TABLE {GetReceivedTableName()} (  
+              ""Id"" BIGINT NOT NULL,
+              ""Version"" VARCHAR(20) DEFAULT NULL,
+              ""Name"" VARCHAR(400) NOT NULL,
+              ""Group"" VARCHAR(200) DEFAULT NULL,
+              ""Content"" CLOB,
+              ""Retries"" INT DEFAULT NULL,
+              ""Added"" DATETIME NOT NULL,
+              ""ExpiresAt"" DATETIME DEFAULT NULL,
+              ""StatusName"" VARCHAR(50) NOT NULL,
+              CONSTRAINT ""PK_{GetOnlyTableNameString(GetReceivedTableName())}"" PRIMARY KEY (""Id"")
+        )';  
+    END IF; 
+    SELECT COUNT(*)  
+    INTO v_count  
+    FROM USER_TABLES  
+    WHERE TABLE_NAME = '{GetOnlyTableNameString(GetPublishedTableName())}';  
+    IF v_count = 0 THEN  
+        EXECUTE IMMEDIATE 'CREATE TABLE {GetPublishedTableName()} (  
+          ""Id"" BIGINT NOT NULL,
+          ""Version"" VARCHAR(20) DEFAULT NULL,
+          ""Name"" VARCHAR(200) NOT NULL,
+          ""Content"" CLOB,
+          ""Retries"" INT DEFAULT NULL,
+          ""Added"" DATETIME NOT NULL,
+          ""ExpiresAt"" DATETIME DEFAULT NULL,
+          ""StatusName"" VARCHAR(40) NOT NULL,
+          CONSTRAINT ""PK_{GetOnlyTableNameString(GetPublishedTableName())}"" PRIMARY KEY (""Id"")  
+        )';  
+    END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM USER_INDEXES 
+    WHERE TABLE_NAME ='{GetOnlyTableNameString(GetReceivedTableName())}' 
+    AND INDEX_NAME = 'IX_{GetOnlyTableNameString(GetReceivedTableName())}_Version_ExpiresAt_StatusName'
+  ) THEN
+    EXECUTE IMMEDIATE 'CREATE INDEX ""IX_{GetOnlyTableNameString(GetReceivedTableName())}_Version_ExpiresAt_StatusName"" ON  {GetReceivedTableName()} (""Version"", ""ExpiresAt"", ""StatusName"")';
+  END IF;  
+  IF NOT EXISTS (
+    SELECT 1 FROM USER_INDEXES 
+    WHERE TABLE_NAME ='{GetOnlyTableNameString(GetReceivedTableName())}'
+    AND INDEX_NAME = 'IX_{GetOnlyTableNameString(GetReceivedTableName())}_ExpiresAt_StatusName'
+  ) THEN
+    EXECUTE IMMEDIATE 'CREATE INDEX ""IX_{GetOnlyTableNameString(GetReceivedTableName())}_ExpiresAt_StatusName"" ON  {GetReceivedTableName()} (""ExpiresAt"", ""StatusName"")';
+  END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM USER_INDEXES 
+    WHERE TABLE_NAME ='{GetOnlyTableNameString(GetPublishedTableName())}' 
+    AND INDEX_NAME = 'IX_{GetOnlyTableNameString(GetPublishedTableName())}_Version_ExpiresAt_StatusName'
+  ) THEN
+    EXECUTE IMMEDIATE 'CREATE INDEX ""IX_{GetOnlyTableNameString(GetPublishedTableName())}_Version_ExpiresAt_StatusName"" ON  {GetPublishedTableName()} (""Version"", ""ExpiresAt"", ""StatusName"")';
+  END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM USER_INDEXES 
+    WHERE TABLE_NAME ='{GetOnlyTableNameString(GetPublishedTableName())}' 
+    AND INDEX_NAME = 'IX_{GetOnlyTableNameString(GetPublishedTableName())}_ExpiresAt_StatusName'
+  ) THEN
+    EXECUTE IMMEDIATE 'CREATE INDEX ""IX_{GetOnlyTableNameString(GetPublishedTableName())}_ExpiresAt_StatusName"" ON  {GetPublishedTableName()} (""ExpiresAt"", ""StatusName"")';
+  END IF;
+END;
+    ";
+            return batchSql;
+        }
+
     }
 }
