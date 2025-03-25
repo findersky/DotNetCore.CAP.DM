@@ -81,6 +81,7 @@ SELECT
             var where = string.Empty;
             if (!string.IsNullOrEmpty(queryDto.StatusName))
             {
+                queryDto.StatusName = GetStatusName(queryDto.StatusName).ToString();
                 where += @" and ""StatusName""=:StatusName";
             }
 
@@ -145,6 +146,14 @@ SELECT
             }, sqlParams);
 
             return new PagedQueryResult<MessageDto> { Items = items, PageIndex = queryDto.CurrentPage, PageSize = queryDto.PageSize, Totals = count };
+        }
+
+        public StatusName GetStatusName(string status)
+        {
+            StatusName? statusName = Enum.GetValues(typeof(StatusName))
+        .Cast<StatusName>()
+        .FirstOrDefault(c => c.ToString().Equals(status, StringComparison.OrdinalIgnoreCase));
+            return statusName.Value;
         }
 
         public int PublishedFailedCount()

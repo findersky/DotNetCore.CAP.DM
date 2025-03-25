@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dm;
@@ -50,7 +51,7 @@ namespace DotNetCore.CAP.DM
         public MediumMessage StoreMessage(string name, Message content, object dbTransaction = null)
         {
             var sql = $@"INSERT INTO {_pubName}(""Id"",""Version"",""Name"",""Content"",""Retries"",""Added"",""ExpiresAt"",""StatusName"")" +
-                      $" VALUES(@Id,'{_options.Value.Version}',:Name,:Content,:Retries,:Added,:ExpiresAt,:StatusName);";
+                      $" VALUES(:Id,'{_options.Value.Version}',:Name,:Content,:Retries,:Added,:ExpiresAt,:StatusName);";
 
             var message = new MediumMessage
             {

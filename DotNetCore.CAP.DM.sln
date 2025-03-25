@@ -1,9 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35514.174 d17.12
+VisualStudioVersion = 17.12.35514.174
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetCore.CAP.DM", "src\DotNetCore.CAP.DM\DotNetCore.CAP.DM.csproj", "{A86B21C1-D8D9-4249-A1C1-7DDBDAB59294}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{DBFF9052-8BC9-45AE-AC9B-BF62BF705EE7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample.RabbitMQ.DM", "Samples\Sample.RabbitMQ.DM\Sample.RabbitMQ.DM.csproj", "{571A6D59-C039-493E-8DA5-925E043FA421}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{FE4F1E53-E4C3-4B61-AD88-DB30186AA12A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +21,16 @@ Global
 		{A86B21C1-D8D9-4249-A1C1-7DDBDAB59294}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A86B21C1-D8D9-4249-A1C1-7DDBDAB59294}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A86B21C1-D8D9-4249-A1C1-7DDBDAB59294}.Release|Any CPU.Build.0 = Release|Any CPU
+		{571A6D59-C039-493E-8DA5-925E043FA421}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{571A6D59-C039-493E-8DA5-925E043FA421}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{571A6D59-C039-493E-8DA5-925E043FA421}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{571A6D59-C039-493E-8DA5-925E043FA421}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A86B21C1-D8D9-4249-A1C1-7DDBDAB59294} = {DBFF9052-8BC9-45AE-AC9B-BF62BF705EE7}
+		{571A6D59-C039-493E-8DA5-925E043FA421} = {FE4F1E53-E4C3-4B61-AD88-DB30186AA12A}
 	EndGlobalSection
 EndGlobal

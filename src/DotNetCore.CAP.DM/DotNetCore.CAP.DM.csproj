@@ -8,14 +8,14 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/findersky/DotNetCore.CAP.DM</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <AssemblyVersion>5.1.3.1</AssemblyVersion>
-    <FileVersion>5.1.3.1</FileVersion>
-    <Version>5.1.3.1</Version>
+    <AssemblyVersion>5.1.3.2</AssemblyVersion>
+    <FileVersion>5.1.3.2</FileVersion>
+    <Version>5.1.3.2</Version>
     <Authors>findersky</Authors>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageTags>DotNetCore.CAP.DM;DotNetCore.CAP;CAP;DotNetCore</PackageTags>
     <PackageReleaseNotes>DotNetCore.CAP.DM provides DM (Dameng Database) storage support for DotNetCore.CAP.
-1、Update Scripts
+1、Fix bug
 </PackageReleaseNotes>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
