@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <Authors>findersky</Authors>
     <PackageProjectUrl>https://github.com/findersky/DotNetCore.CAP.DM</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/findersky/CAP</RepositoryUrl>
+    <RepositoryUrl>https://github.com/findersky/DotNetCore.CAP.DM</RepositoryUrl>
     <PackageTags>DotNetCore.CAP.DM;DotNetCore.CAP;CAP;DotNetCore</PackageTags>
     <PackageReleaseNotes>DotNetCore.CAP.DM provides DM (Dameng Database) storage support for DotNetCore.CAP.
 1、Update to the latest version
@@ -14,15 +14,27 @@
     <RepositoryType>git</RepositoryType>
     <Version>8.3.3</Version>
     <AssemblyVersion>8.3.3</AssemblyVersion>
-    <FileVersion>8.3.3</FileVersion>  </PropertyGroup>
+    <FileVersion>8.3.3</FileVersion>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="DM.DmProvider" Version="8.3.1.28188" />
     <PackageReference Include="DotNetCore.CAP" Version="8.3.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.17" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.36" />
   </ItemGroup>
 
 </Project>
