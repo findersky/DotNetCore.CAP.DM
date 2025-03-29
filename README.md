@@ -8,12 +8,44 @@ You can also use CAP as an EventBus. CAP provides a simpler way to implement eve
 
 DotNetCore.CAP.DM provides support for CAP with DM (Dameng) database integration.
 
-This project primarily addresses a current need to migrate to the DM database, implemented using a lower version of CAP. A subsequent merge request will be submitted to the CAP project.
 
 ## Install
 ```
 Install-Package DotNetCore.CAP.DM
 ```
+## Usage
+```csharp
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddCap(x =>
+            {
+                x.UseStorageLock=true;
+                x.UseDM(ConnectionString);
+                x.UseRabbitMQ("localhost");
+                x.UseDashboard();
+            });
+        }
+
+```
+
+```csharp
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddCap(x =>
+            {
+                x.UseStorageLock=true;
+                x.UseDM((option => {
+                      option.ConnectionString = ConnectionString;
+                      option.Schema = "SchemaName";
+                 });
+                x.UseRabbitMQ("localhost");
+                x.UseDashboard();
+            });
+        }
+
+```
+
+
 
 
 
