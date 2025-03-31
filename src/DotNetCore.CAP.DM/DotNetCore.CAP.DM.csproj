@@ -1,24 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Title>DotNetCore.CAP.DM</Title>
-    <PackageProjectUrl>https://github.com/findersky/DotNetCore.CAP.DM</PackageProjectUrl>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/findersky/DotNetCore.CAP.DM</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <AssemblyVersion>5.1.3.1</AssemblyVersion>
-    <FileVersion>5.1.3.1</FileVersion>
-    <Version>5.1.3.1</Version>
     <Authors>findersky</Authors>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/findersky/DotNetCore.CAP.DM</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/findersky/DotNetCore.CAP.DM</RepositoryUrl>
     <PackageTags>DotNetCore.CAP.DM;DotNetCore.CAP;CAP;DotNetCore</PackageTags>
     <PackageReleaseNotes>DotNetCore.CAP.DM provides DM (Dameng Database) storage support for DotNetCore.CAP.
-1、Fix bug
+1、Update to the latest version
 </PackageReleaseNotes>
+    <RepositoryType>git</RepositoryType>
+    <Version>8.3.3</Version>
+    <AssemblyVersion>8.3.3</AssemblyVersion>
+    <FileVersion>8.3.3</FileVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-  </PropertyGroup>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>  </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\..\LICENSE">
@@ -33,9 +33,8 @@
 
   <ItemGroup>
     <PackageReference Include="DM.DmProvider" Version="8.3.1.28188" />
-    <PackageReference Include="DotNetCore.CAP" Version="5.1.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.4" />
+    <PackageReference Include="DotNetCore.CAP" Version="8.3.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.36" />
   </ItemGroup>
 
 </Project>

@@ -1,9 +1,4 @@
-// Copyright (c) .NET Core Community. All rights reserved.
-// Licensed under the MIT License. See License.txt in the project root for license information.
-
-using System.Threading;
-using System.Threading.Tasks;
-using Dm;
+﻿using Dm;
 using DotNetCore.CAP.Persistence;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -12,13 +7,14 @@ namespace DotNetCore.CAP.DM
 {
     public class DMStorageInitializer : IStorageInitializer
     {
-        private readonly IOptions<DMOptions> _options;
+        private readonly IOptions<CapOptions> _capOptions;
         private readonly ILogger _logger;
-
+        private readonly IOptions<DMOptions> _options;
         public DMStorageInitializer(
             ILogger<DMStorageInitializer> logger,
-            IOptions<DMOptions> options)
+            IOptions<DMOptions> options, IOptions<CapOptions> capOptions)
         {
+            _capOptions = capOptions;
             _options = options;
             _logger = logger;
         }
@@ -33,24 +29,44 @@ namespace DotNetCore.CAP.DM
             return $@"""{_options.Value.Schema}"".""received""";
         }
 
+        public virtual string GetLockTableName()
+        {
+            return $@"""{_options.Value.Schema}"".""lock""";
+        }
+
         public async Task InitializeAsync(CancellationToken cancellationToken)
         {
             if (cancellationToken.IsCancellationRequested) return;
 
             var sql = CreateDbTablesScript();
-            await using (var connection = new DmConnection(_options.Value.ConnectionString))
-            connection.ExecuteNonQuery(sql);
+            var connection = new DmConnection(_options.Value.ConnectionString);
+            await using var _ = connection.ConfigureAwait(false);
+            await connection.ExecuteNonQueryAsync(sql).ConfigureAwait(false);
+
+            if (_capOptions.Value.UseStorageLock)
+            {
+                sql = InitLockDbTableScript();
+                object[] sqlParams =
+                {
+                new DmParameter("PubKey", $"publish_retry_{_capOptions.Value.Version}"),
+                new DmParameter("LastLockTime", DateTime.MinValue) {
+                   DmSqlType= DmDbType.DateTime
+                },
+                new DmParameter("RecKey", $"received_retry_{_capOptions.Value.Version}"),
+
+            };
+                await connection.ExecuteNonQueryAsync(sql, sqlParams: sqlParams).ConfigureAwait(false);
+            }
             _logger.LogDebug("Ensuring all create database tables script are applied.");
         }
-
 
         private string GetOnlyTableNameString(string schemaTableName)
         {
             if (string.IsNullOrWhiteSpace(schemaTableName))
-            {
-                return "";
+            { 
+               return "";
             }
-            return schemaTableName.Replace("\"", "").Replace($"{_options.Value.Schema}.", "");
+            return schemaTableName.Replace("\"", "").Replace($"{_options.Value.Schema}.","");
         }
         protected virtual string CreateDbTablesScript()
         {
@@ -126,10 +142,44 @@ BEGIN
   ) THEN
     EXECUTE IMMEDIATE 'CREATE INDEX ""IX_{GetOnlyTableNameString(GetPublishedTableName())}_ExpiresAt_StatusName"" ON  {GetPublishedTableName()} (""ExpiresAt"", ""StatusName"")';
   END IF;
-END;
     ";
+            if (_capOptions.Value.UseStorageLock)
+            {
+                batchSql += $@"
+    SELECT COUNT(*)  
+    INTO v_count  
+    FROM USER_TABLES  
+    WHERE TABLE_NAME = '{GetOnlyTableNameString(GetLockTableName())}';  
+    IF v_count = 0 THEN  
+        EXECUTE IMMEDIATE 'CREATE TABLE {GetLockTableName()} (  
+            ""Key"" VARCHAR(128) NOT NULL,
+            ""Instance"" VARCHAR(256),
+            ""LastLockTime"" TIMESTAMP(3) NOT NULL,
+              CONSTRAINT ""PK_{GetOnlyTableNameString(GetLockTableName())}"" PRIMARY KEY (""Key"")
+        )';  
+    END IF; ";
+            }
+            batchSql += $@"
+END;";
             return batchSql;
         }
+
+
+        protected virtual string InitLockDbTableScript()
+        {
+            return @$"
+MERGE INTO {GetLockTableName()} t
+USING (
+    SELECT :PubKey AS key_val, :LastLockTime AS time_val FROM DUAL
+    UNION ALL
+    SELECT :RecKey, :LastLockTime FROM DUAL
+) s
+ON (t.""Key"" = s.key_val)
+WHEN NOT MATCHED THEN 
+    INSERT (""Key"", ""Instance"", ""LastLockTime"") 
+    VALUES (s.key_val, '', s.time_val);";
+        }
+
 
     }
 }

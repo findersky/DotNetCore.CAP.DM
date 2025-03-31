@@ -1,14 +1,9 @@
-﻿// Copyright (c) .NET Core Community. All rights reserved.
-// Licensed under the MIT License. See License.txt in the project root for license information.
-
-using System;
-using DotNetCore.CAP;
+﻿using DotNetCore.CAP;
 using Microsoft.EntityFrameworkCore;
 
-// ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class CapOptionsExtensions
+    public static class CAPOptionsExtensions
     {
         public static CapOptions UseDM(this CapOptions options, string connectionString)
         {
@@ -17,10 +12,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static CapOptions UseDM(this CapOptions options, Action<DMOptions> configure)
         {
-            if (configure == null)
-            {
-                throw new ArgumentNullException(nameof(configure));
-            }
+            if (configure == null) throw new ArgumentNullException(nameof(configure));
 
             configure += x => x.Version = options.Version;
 
@@ -38,16 +30,13 @@ namespace Microsoft.Extensions.DependencyInjection
         public static CapOptions UseEntityFramework<TContext>(this CapOptions options, Action<EFOptions> configure)
             where TContext : DbContext
         {
-            if (configure == null)
-            {
-                throw new ArgumentNullException(nameof(configure));
-            }
+            if (configure == null) throw new ArgumentNullException(nameof(configure));
 
             options.RegisterExtension(new DMCapOptionsExtension(x =>
             {
                 configure(x);
-                x.DbContextType = typeof(TContext);
                 x.Version = options.Version;
+                x.DbContextType = typeof(TContext);
             }));
 
             return options;
