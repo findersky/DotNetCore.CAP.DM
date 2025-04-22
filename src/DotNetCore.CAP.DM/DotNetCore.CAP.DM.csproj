@@ -12,9 +12,9 @@
 1、Update to the latest version
 </PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
-    <Version>8.3.3</Version>
-    <AssemblyVersion>8.3.3</AssemblyVersion>
-    <FileVersion>8.3.3</FileVersion>
+    <Version>8.3.4</Version>
+    <AssemblyVersion>8.3.4</AssemblyVersion>
+    <FileVersion>8.3.4</FileVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
@@ -33,7 +33,7 @@
 
   <ItemGroup>
     <PackageReference Include="DM.DmProvider" Version="8.3.1.28188" />
-    <PackageReference Include="DotNetCore.CAP" Version="8.3.3" />
+    <PackageReference Include="DotNetCore.CAP" Version="8.3.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.36" />
   </ItemGroup>
 
