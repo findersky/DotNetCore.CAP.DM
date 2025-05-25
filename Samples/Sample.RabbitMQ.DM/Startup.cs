@@ -9,7 +9,11 @@
             services.AddCap(x =>
             {
                 //x.UseStorageLock=true;
-                x.UseDM(ConnectionString);
+                //x.UseDM(ConnectionString);
+                x.UseDM((option => {
+                    option.ConnectionString = ConnectionString;
+                    option.Schema = "SYSDBA";
+                }));
                 x.UseRabbitMQ("localhost");
                 x.UseDashboard();
             });
